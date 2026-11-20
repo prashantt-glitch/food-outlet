@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#d52518">
+  <meta name="view-transition" content="same-origin">
+  <title>Order Counter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@400;600;800&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-view="counter">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div>
+        <div class="brand-name" id="brandName">OUTLET NAME</div>
+        <div class="brand-sub" id="brandSub">Staff order counter</div>
+      </div>
+    </div>
+    <div class="sync" id="syncPill" title="Sync status"><i></i><span>Local</span></div>
+  </header>
+  <div class="stripes" aria-hidden="true"></div>
+
+  <nav class="tabs" id="tabs">
+    <button data-view="counter" class="active"><b>01</b>Counter</button>
+    <button data-view="kitchen"><b>02</b>Kitchen</button>
+    <button data-view="orders"><b>03</b>Orders</button>
+    <button data-view="dashboard"><b>04</b>Sales</button>
+    <button data-view="settings"><b>05</b>Settings</button>
+  </nav>
+
+  <main id="main">
+    <!-- COUNTER -->
+    <section class="view" id="view-counter">
+      <div class="counter-layout">
+        <div>
+          <div class="hero">
+            <div class="hero-text">
+              <div class="hero-kicker">Today's menu</div>
+              <h1 id="heroTitle">HOT. FAST.<br><span>LOADED.</span></h1>
+            </div>
+            <div class="hero-token">Next token<b id="nextToken">#001</b></div>
+          </div>
+          <div class="menu" id="menu"></div>
+        </div>
+
+        <aside class="cart" id="cart">
+          <div class="cart-head">
+            <h2>Current order</h2>
+            <button class="link" id="clearCart">Clear</button>
+          </div>
+          <div class="cart-lines" id="cartLines"></div>
+          <label class="field">
+            <span>Customer name / note (optional)</span>
+            <input id="orderNote" maxlength="60" placeholder="e.g. Rahul, less spicy">
+          </label>
+          <div class="pay-toggle" id="payToggle">
+            <button data-pay="Cash" class="active">Cash</button>
+            <button data-pay="UPI">UPI</button>
+          </div>
+          <div class="qr-box" id="qrBox" hidden>
+            <div class="qr" id="qrCode"></div>
+            <div class="qr-meta">
+              <b id="qrAmount">₹0</b>
+              <span id="qrUpi">Set UPI ID in Settings</span>
+            </div>
+          </div>
+          <div class="cart-total">
+            <span>Total</span><b id="cartTotal">₹0</b>
+          </div>
+          <button class="btn-primary" id="placeOrder" disabled>Place order</button>
+        </aside>
+      </div>
+
+      <button class="cart-fab" id="cartFab" hidden>
+        <span class="fab-count" id="fabCount">0</span>
+        <span>View order</span>
+        <b id="fabTotal">₹0</b>
+      </button>
+    </section>
+
+    <!-- KITCHEN -->
+    <section class="view" id="view-kitchen" hidden>
+      <div class="kitchen">
+        <div class="kcol" data-status="new"><h3><i class="dot new"></i>New <em id="cNew">0</em></h3><div class="klist" id="kNew"></div></div>
+        <div class="kcol" data-status="preparing"><h3><i class="dot prep"></i>Preparing <em id="cPrep">0</em></h3><div class="klist" id="kPrep"></div></div>
+        <div class="kcol" data-status="ready"><h3><i class="dot ready"></i>Ready <em id="cReady">0</em></h3><div class="klist" id="kReady"></div></div>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section class="view" id="view-orders" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>All orders</h2>
+          <input id="orderSearch" class="search" placeholder="Search token or item">
+        </div>
+        <div id="orderList" class="order-list"></div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section class="view" id="view-dashboard" hidden>
+      <div class="locked" id="dashLock">
+        <p>Enter PIN to view sales</p>
+        <input type="password" inputmode="numeric" maxlength="8" class="pin" id="dashPin" placeholder="••••">
+        <button class="btn-primary small" id="dashUnlock">Unlock</button>
+      </div>
+      <div id="dash" hidden>
+        <div class="stats">
+          <div class="stat s-red"><span>Revenue</span><b data-count id="sRevenue">₹0</b></div>
+          <div class="stat s-green"><span>Orders</span><b data-count id="sOrders">0</b></div>
+          <div class="stat s-orange"><span>Cash</span><b data-count id="sCash">₹0</b></div>
+          <div class="stat s-yellow"><span>UPI</span><b data-count id="sUpi">₹0</b></div>
+        </div>
+        <div class="dash-grid">
+          <div class="panel">
+            <h2>Item sales</h2>
+            <div id="itemBars" class="bars"></div>
+          </div>
+          <div class="panel">
+            <h2>Stock left</h2>
+            <div id="stockList" class="stock-list"></div>
+          </div>
+          <div class="panel wide">
+            <h2>Orders by hour</h2>
+            <div id="hourChart" class="hours"></div>
+          </div>
+        </div>
+        <button class="btn-ghost" id="exportCsv">Download orders (CSV)</button>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" id="view-settings" hidden>
+      <div class="locked" id="setLock">
+        <p>Enter PIN to change settings</p>
+        <input type="password" inputmode="numeric" maxlength="8" class="pin" id="setPin" placeholder="••••">
+        <button class="btn-primary small" id="setUnlock">Unlock</button>
+      </div>
+      <form id="settingsForm" class="panel settings" hidden>
+        <h2>Outlet</h2>
+        <label class="field"><span>Outlet name</span><input name="outletName"></label>
+        <label class="field"><span>Tagline (under the name)</span><input name="tagline"></label>
+
+        <h2>Prices (₹)</h2>
+        <div class="grid2" id="priceFields"></div>
+
+        <h2>Stock (portions available, leave empty = no limit)</h2>
+        <div class="grid2">
+          <label class="field"><span>Biriyani portions</span><input name="stock.biriyani" type="number" min="0"></label>
+          <label class="field"><span>Chicken 65 portions</span><input name="stock.chick65" type="number" min="0"></label>
+          <label class="field"><span>Badam milk glasses</span><input name="stock.badam" type="number" min="0"></label>
+          <label class="field"><span>Bread halwa portions</span><input name="stock.halwa" type="number" min="0"></label>
+        </div>
+
+        <h2>UPI</h2>
+        <div class="grid2">
+          <label class="field"><span>UPI ID</span><input name="upiId" placeholder="name@okaxis"></label>
+          <label class="field"><span>Payee name</span><input name="upiName"></label>
+        </div>
+        <label class="field"><span>Or: QR image file name in the repo (used if UPI ID is empty)</span><input name="qrImage" placeholder="upi-qr.png"></label>
+
+        <h2>Security</h2>
+        <label class="field"><span>PIN for Sales & Settings</span><input name="pin" inputmode="numeric" maxlength="8"></label>
+
+        <button class="btn-primary" type="submit">Save settings</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- Token confirmation -->
+  <div class="overlay" id="tokenOverlay" hidden>
+    <div class="token-card" id="tokenCard">
+      <div class="burst" id="burst"></div>
+      <div class="token-label">Order placed</div>
+      <div class="token-num" id="tokenNum">#001</div>
+      <div class="token-items" id="tokenItems"></div>
+      <div class="token-pay" id="tokenPay"></div>
+      <button class="btn-primary" id="newOrder">Next order</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@2.0.4/dist/qrcode.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
