@@ -435,3 +435,7 @@ main { padding: 14px clamp(14px, 3vw, 32px) 120px; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
 body.token-open .cart { view-transition-name: none; }
+
+.item-img img { position: relative; z-index: 1; }
+.item-img .tag, .item-img .left { z-index: 2; }
+.item.sold .item-img::after { z-index: 3; }
